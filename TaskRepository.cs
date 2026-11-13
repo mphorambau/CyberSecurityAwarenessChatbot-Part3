@@ -21,7 +21,7 @@ public sealed class TaskRepository
 VALUES(@title,@description,@reminder,@completed); SELECT LAST_INSERT_ID();", db);
         cmd.Parameters.AddWithValue("@title", task.Title);
         cmd.Parameters.AddWithValue("@description", task.Description);
-        cmd.Parameters.AddWithValue("@reminder", task.ReminderAt);
+        cmd.Parameters.AddWithValue("@reminder", (object?)task.ReminderAt ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@completed", task.IsCompleted);
         return Convert.ToInt32(await cmd.ExecuteScalarAsync());
     }
@@ -42,7 +42,7 @@ VALUES(@title,@description,@reminder,@completed); SELECT LAST_INSERT_ID();", db)
     {
         await using var db = await OpenAsync();
         await using var cmd = new MySqlCommand("UPDATE tasks SET reminder_at=@reminder WHERE id=@id", db);
-        cmd.Parameters.AddWithValue("@reminder", reminderAt);
+        cmd.Parameters.AddWithValue("@reminder", (object?)reminderAt ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@id", id);
         await cmd.ExecuteNonQueryAsync();
     }
