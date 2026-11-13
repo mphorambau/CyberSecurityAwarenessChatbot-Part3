@@ -37,6 +37,7 @@ public sealed class MainForm : Form
         var tasksButton = MakeButton("Tasks");
         tasksButton.Click += async (_, _) => await OpenTasksAsync();
         actions.Controls.Add(tasksButton);
+        AddAction(actions,"Test Voice",()=>PlayGreeting(displayName));
         AddAction(actions,"Cyber Quiz",()=>{_log.Add("Quiz opened");new QuizForm(_log).ShowDialog(this);});
         AddAction(actions,"Activity Log",ShowActivity);
         foreach(var topic in new[]{"Privacy","Malware","Suspicious links","Passwords","Phishing"})
@@ -51,11 +52,23 @@ public sealed class MainForm : Form
                 _engine.RememberName(displayName);
             }
         }
-        var voicePlayed = VoicePlayer.TryPlayGreeting($"Welcome, {displayName}! Welcome to the Cybersecurity Awareness Assistant. Ask me about cybersecurity and stay safe online.");
-        Append("Assistant", voicePlayed
-            ? $"Welcome, {displayName}! Your voice greeting is playing. Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log."
-            : $"Welcome, {displayName}! Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log.");
+        Shown += (_, _) => PlayGreeting(displayName);
+        Append("Assistant", $"Welcome, {displayName}! Ask me about cybersecurity, or use Tasks, Test Voice, Cyber Quiz and Activity Log.");
         _log.Add("Application started");
+    }
+
+    private void PlayGreeting(string displayName)
+    {
+        var spokenText = $"Welcome, {displayName}! Welcome to the Cybersecurity Awareness Assistant. Ask me about cybersecurity and stay safe online.";
+        if (VoicePlayer.TryPlayGreeting(spokenText, out var error))
+        {
+            Append("Assistant", "Voice playback was requested. If you cannot hear it, click Test Voice and check Windows sound settings.");
+        }
+        else
+        {
+            Append("Assistant", "Voice playback failed: " + error);
+            MessageBox.Show(this, error, "Voice playback unavailable", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     private static Button MakeButton(string text)=>new(){Text=text,AutoSize=true,FlatStyle=FlatStyle.Flat,
