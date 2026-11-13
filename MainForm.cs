@@ -40,7 +40,19 @@ public sealed class MainForm : Form
         foreach(var topic in new[]{"Privacy","Malware","Suspicious links","Passwords","Phishing"})
             AddAction(actions,topic,()=>Append("Assistant",_engine.Respond(topic)));
         Controls.Add(_transcript); Controls.Add(composer); Controls.Add(actions); Controls.Add(header);
-        Append("Assistant","Welcome! Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log. You can also tell me your name.");
+        var displayName = "friend";
+        using (var prompt = new NamePrompt())
+        {
+            if (prompt.ShowDialog() == DialogResult.OK && prompt.NameValue.Length >= 2)
+            {
+                displayName = prompt.NameValue;
+                _engine.RememberName(displayName);
+            }
+        }
+        var voicePlayed = VoicePlayer.TryPlayGreeting();
+        Append("Assistant", voicePlayed
+            ? $"Welcome, {displayName}! Your voice greeting is playing. Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log."
+            : $"Welcome, {displayName}! Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log.");
         _log.Add("Application started");
     }
 
