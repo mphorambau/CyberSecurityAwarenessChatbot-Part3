@@ -37,3 +37,18 @@ The activity log is session-based. Never commit database passwords or secrets; u
 
 ## Presentation
 Add the unlisted YouTube presentation URL after recording and uploading the voice-over demonstration.
+
+## Part 2 functionality carried forward
+
+The Part 3 chatbot retains the core Part 2 conversational behaviour:
+- A welcome/name prompt and in-session name memory.
+- Multiple varied responses for phishing, password safety, suspicious links, malware, privacy and scams.
+- Sentiment-aware replies for worried, anxious, confused, overwhelmed and curious users.
+- Contextual follow-up prompts such as "tell me more" and "another tip".
+- An optional voice-greeting player. If the original `Assets/greeting.wav` file is available, the project copies it to the output folder and plays it at startup. The binary greeting file still needs to be present in the repository's `Assets` folder for audio playback.
+
+Part 2 source repository (read-only reference): https://github.com/mphorambau/CyberSecurityAwarenessChatbot-Part2
+
+## Build verification
+
+A Windows GitHub Actions workflow runs NuGet restore and a Release build on pushes and pull requests to `main`. It can also be started manually from the repository's **Actions** tab using **Windows .NET Build**. The workflow was configured in commit `6e28e9e`; check the Actions tab for the latest run result before treating the project as build-verified.
