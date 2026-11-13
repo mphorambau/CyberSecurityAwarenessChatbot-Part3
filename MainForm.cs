@@ -51,7 +51,7 @@ public sealed class MainForm : Form
                 _engine.RememberName(displayName);
             }
         }
-        var voicePlayed = VoicePlayer.TryPlayGreeting();
+        var voicePlayed = VoicePlayer.TryPlayGreeting($"Welcome, {displayName}! Welcome to the Cybersecurity Awareness Assistant. Ask me about cybersecurity and stay safe online.");
         Append("Assistant", voicePlayed
             ? $"Welcome, {displayName}! Your voice greeting is playing. Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log."
             : $"Welcome, {displayName}! Ask me about cybersecurity, or use Tasks, Cyber Quiz and Activity Log.");
