@@ -38,6 +38,15 @@ VALUES(@title,@description,@reminder,@completed); SELECT LAST_INSERT_ID();", db)
         return tasks;
     }
 
+    public async Task SetReminderAsync(int id, DateTime? reminderAt)
+    {
+        await using var db = await OpenAsync();
+        await using var cmd = new MySqlCommand("UPDATE tasks SET reminder_at=@reminder WHERE id=@id", db);
+        cmd.Parameters.AddWithValue("@reminder", reminderAt);
+        cmd.Parameters.AddWithValue("@id", id);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         await using var db = await OpenAsync();
