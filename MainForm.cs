@@ -34,7 +34,9 @@ public sealed class MainForm : Form
         composer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); composer.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,110));
         composer.Controls.Add(_input,0,0); composer.Controls.Add(send,1,0);
         var actions=new FlowLayoutPanel { Dock=DockStyle.Bottom, Height=52, Padding=new Padding(8), BackColor=Color.FromArgb(18,39,65) };
-        AddAction(actions,"Tasks",async()=>await OpenTasksAsync());
+        var tasksButton = MakeButton("Tasks");
+        tasksButton.Click += async (_, _) => await OpenTasksAsync();
+        actions.Controls.Add(tasksButton);
         AddAction(actions,"Cyber Quiz",()=>{_log.Add("Quiz opened");new QuizForm(_log).ShowDialog(this);});
         AddAction(actions,"Activity Log",ShowActivity);
         foreach(var topic in new[]{"Privacy","Malware","Suspicious links","Passwords","Phishing"})
@@ -84,8 +86,25 @@ public sealed class MainForm : Form
     }
     private async Task OpenTasksAsync()
     {
-        if(_tasks is null){MessageBox.Show(this,"Set CYBERBOT_MYSQL to your MySQL connection string, then run database/schema.sql.","MySQL not configured",MessageBoxButtons.OK,MessageBoxIcon.Information);return;}
-        using var form=new TaskManagerForm(_tasks,_log);form.ShowDialog(this);await Task.CompletedTask;
+        if (_tasks is null)
+        {
+            MessageBox.Show(this,
+                "The Tasks feature needs a MySQL connection.\n\n1. Create the database by running database/schema.sql in MySQL Workbench.\n2. Set the CYBERBOT_MYSQL environment variable to your connection string, for example:\nServer=localhost;Port=3306;Database=cyber_awareness;User ID=root;Password=YOUR_PASSWORD;\n3. Restart the application and click Tasks again.",
+                "MySQL setup required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        try
+        {
+            using var form = new TaskManagerForm(_tasks, _log);
+            form.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, "The Task Manager could not open. Check that MySQL is running and that the database schema has been created.\n\nDetails: " + ex.Message,
+                "Task Manager error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        await Task.CompletedTask;
     }
     private void ShowActivity(){_log.Add("Activity log viewed");MessageBox.Show(this,string.Join(Environment.NewLine,_log.Latest(10)),"Recent Activity",MessageBoxButtons.OK,MessageBoxIcon.Information);}
 }
